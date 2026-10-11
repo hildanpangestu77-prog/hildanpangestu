@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EduSmart Assistant – Asisten Produktivitas Pribadi</title>
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#2a2622;--mut:#8a8178;--acc:#e8683a;--acc2:#fde6dc;--bot:#f0ebe3;--line:#e7e0d6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1a18;--card:#26231f;--ink:#f0ebe3;--mut:#9a9186;--acc:#f08457;--acc2:#3a2a22;--bot:#2e2a25;--line:#3a352f}}
+:root[data-theme="dark"]{--bg:#1c1a18;--card:#26231f;--ink:#f0ebe3;--mut:#9a9186;--acc:#f08457;--acc2:#3a2a22;--bot:#2e2a25;--line:#3a352f}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+.app{display:grid;grid-template-columns:300px 1fr;height:100%;max-width:1000px;margin:0 auto}
+aside{border-right:1px solid var(--line);padding:16px;overflow-y:auto;background:var(--card)}
+h1{font-size:18px;margin:0 0 2px}h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:18px 0 8px}
+.sub{color:var(--mut);font-size:13px;margin:0}
+label{display:block;font-size:13px;margin:8px 0 3px;color:var(--mut)}
+select,input[type=text],textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.row{display:flex;align-items:center;gap:8px;font-size:14px;margin:8px 0}
+ul{list-style:none;padding:0;margin:0}
+li.t{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
+li.done span{text-decoration:line-through;color:var(--mut)}
+li.m{font-size:13px;color:var(--mut);padding:3px 0}
+.empty{color:var(--mut);font-size:13px}
+main{display:flex;flex-direction:column;min-height:0;height:100%}
+#log{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.b{max-width:85%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;word-wrap:break-word}
+.b.u{align-self:flex-end;background:var(--acc);color:#fff;border-bottom-right-radius:4px}
+.b.k{align-self:flex-start;background:var(--bot);border-bottom-left-radius:4px;white-space:normal}
+.b p{margin:4px 0}.b h4{margin:8px 0 2px;font-size:15px}.b ul,.b ol{margin:4px 0;padding-left:20px}.b ul{list-style:disc}.b li{margin:2px 0}
+.b code{background:var(--line);padding:1px 5px;border-radius:5px;font-size:13px}.b pre{background:var(--line);padding:10px;border-radius:10px;overflow-x:auto;margin:6px 0;white-space:pre}
+.acts{display:flex;gap:10px;margin-top:6px}.acts button{background:none;border:0;color:var(--mut);cursor:pointer;font-size:12px;padding:0}.acts button:hover{color:var(--acc)}
+.dots{color:var(--mut);animation:p 1.2s infinite}@keyframes p{50%{opacity:.4}}
+button.clip{background:none;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:18px;cursor:pointer;color:var(--ink)}
+button.nc{width:100%;margin-top:10px;padding:8px;border:1px dashed var(--acc);background:var(--acc2);color:var(--ink);border-radius:10px;cursor:pointer;font:inherit}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:99px;cursor:pointer;font:inherit;font-size:13px}
+.chip:hover{background:var(--acc2)}
+form,.bar{display:flex;gap:8px;padding:10px 16px;border-top:1px solid var(--line);background:var(--card)}
+.bar input{flex:1}
+button.send{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:0 18px;font:inherit;font-weight:600;cursor:pointer}
+button.send:disabled{opacity:.5}
+button.mini{background:none;border:0;color:var(--mut);cursor:pointer;font-size:12px;padding:0}
+@media (max-width:720px){.app{grid-template-columns:1fr;grid-template-rows:auto 1fr}aside{border-right:0;border-bottom:1px solid var(--line);max-height:34vh}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <h1>🦊 EduSmart Assistant</h1>
+  <p class="sub">Asisten produktivitas pribadimu</p>
+  <button class="nc" id="newc">+ Obrolan baru</button>
+  <details id="keyd" style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;color:var(--mut)">⚙️ Pengaturan AI (API key)</summary>
+    <label>API key Anthropic — dibutuhkan jika dibuka di luar claude.ai</label>
+    <input type="password" id="key" placeholder="sk-ant-..." autocomplete="off">
+    <button class="nc" id="savekey" style="margin-top:6px">Simpan key</button>
+    <p class="sub" id="keymsg" style="margin-top:6px;font-size:12px">Key hanya disimpan di browser-mu dan dikirim langsung ke Anthropic.</p>
+  </details>
+
+  <h2>Konfigurasi</h2>
+  <label>Gaya bahasa</label>
+  <select id="style">
+    <option value="santai">Santai (gue/kamu)</option>
+    <option value="gaul">Super gaul</option>
+    <option value="semi">Santai tapi sopan</option>
+  </select>
+  <label>Domain fokus</label>
+  <select id="domain">
+    <option value="umum">Umum</option>
+    <option value="kuliah">Kuliah &amp; belajar</option>
+    <option value="kerja">Kerja &amp; karier</option>
+    <option value="hobi">Hobi &amp; waktu luang</option>
+    <option value="sehat">Kesehatan &amp; kebiasaan</option>
+  </select>
+  <label>Tingkat kreativitas</label>
+  <select id="tier">
+    <option value="quick" selected>Ringkas &amp; cepat</option>
+    <option value="default">Seimbang</option>
+    <option value="complex">Mendalam</option>
+  </select>
+  <div class="row"><input type="checkbox" id="mem" checked><label for="mem" style="margin:0;color:inherit">Memory (ingat info tentangku)</label></div>
+  <div class="row"><input type="checkbox" id="rec" checked><label for="rec" style="margin:0;color:inherit">Rekomendasi proaktif</label></div>
+
+  <h2>Daftar tugas <button class="mini" id="clrT">hapus semua</button></h2>
+  <ul id="tasks"></ul>
+  <h2>Memory <button class="mini" id="clrM">hapus semua</button></h2>
+  <ul id="mems"></ul>
+</aside>
+
+<main>
+  <div id="log"></div>
+  <div class="chips" id="chips"></div>
+  <div id="att" style="padding:0 16px;font-size:13px;color:var(--mut)"></div>
+  <div class="bar">
+    <button class="clip" id="clip" title="Lampirkan gambar">📎</button><input type="file" id="file" accept="image/*" hidden><input type="text" id="inp" placeholder="Ketik pesan… mis. &quot;catat tugas: bikin laporan besok&quot;" autocomplete="off">
+    <button class="send" id="go">Kirim</button>
+  </div>
+</main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let tasks=[],mems=[],hist=[],busy=false,nid=1,sample=null;
+try{const s=JSON.parse(localStorage.getItem("suciiii2")||"{}");tasks=s.tasks||[];mems=s.mems||[];nid=s.nid||1;hist=s.hist||[];
+ ["style","domain","tier"].forEach(k=>{if(s[k])$(k).value=s[k]});if(s.mem===false)$("mem").checked=false;if(s.rec===false)$("rec").checked=false}catch(e){}
+function save(){try{localStorage.setItem("suciiii2",JSON.stringify({tasks,mems,nid,hist:hist.slice(-20),style:$("style").value,domain:$("domain").value,tier:$("tier").value,mem:$("mem").checked,rec:$("rec").checked}))}catch(e){}}
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function render(){
+  const t=$("tasks");t.innerHTML=tasks.length?"":'<li class="empty">Belum ada tugas.</li>';
+  tasks.forEach(x=>{const li=document.createElement("li");li.className="t"+(x.done?" done":"");
+    li.innerHTML=`<input type="checkbox" ${x.done?"checked":""}><span>${esc(x.title)}${x.due?` <small>(${esc(x.due)})</small>`:""}</span>`;
+    li.firstChild.onchange=e=>{x.done=e.target.checked;save();render()};t.appendChild(li)});
+  const m=$("mems");m.innerHTML=mems.length?"":'<li class="empty">Belum ada yang diingat.</li>';
+  mems.forEach(x=>{const li=document.createElement("li");li.className="m";li.textContent="• "+x;m.appendChild(li)});
+}
+function inl(t){return t.replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/(^|[^*])\*([^*\n]+)\*/g,"$1<i>$2</i>")}
+function md(src){
+  const bl=[];let t=esc(src).replace(/```\w*\n?([\s\S]*?)(```|$)/g,(_,c)=>{bl.push(c);return"\u0001"+(bl.length-1)+"\u0001"});
+  const out=[];let L=null;const close=()=>{if(L){out.push("</"+L+">");L=null}};
+  for(const line of t.split("\n")){let m;
+    if(m=line.match(/^\s*[-*•]\s+(.*)/)){if(L!=="ul"){close();out.push("<ul>");L="ul"}out.push("<li>"+inl(m[1])+"</li>")}
+    else if(m=line.match(/^\s*\d+[.)]\s+(.*)/)){if(L!=="ol"){close();out.push("<ol>");L="ol"}out.push("<li>"+inl(m[1])+"</li>")}
+    else{close();if(m=line.match(/^#{1,4}\s+(.*)/))out.push("<h4>"+inl(m[1])+"</h4>");else if(line.trim())out.push("<p>"+inl(line)+"</p>")}}
+  close();return out.join("").replace(/\u0001(\d+)\u0001/g,(_,i)=>"<pre>"+bl[i].replace(/\n$/,"")+"</pre>");
+}
+function add(role,text){const d=document.createElement("div");d.className="b "+(role==="user"?"u":"k");if(role==="user")d.textContent=text;else{d._raw=text;d.innerHTML=md(text)}$("log").appendChild(d);$("log").scrollTop=1e9;return d}
+function setB(b,t){b._raw=t;b.innerHTML=md(t);$("log").scrollTop=1e9}
+function acts(b){document.querySelectorAll(".rg").forEach(x=>x.remove());const d=document.createElement("div");d.className="acts";
+  const c=document.createElement("button");c.textContent="📋 Salin";c.onclick=async()=>{try{await navigator.clipboard.writeText(b._raw);c.textContent="✓ Tersalin"}catch(e){c.textContent="Gagal menyalin"}};
+  const r=document.createElement("button");r.className="rg";r.textContent="🔄 Ulangi";r.onclick=()=>{if(busy)return;const u=hist.length>=2?hist[hist.length-2].content:null;if(!u)return;hist.splice(-2);b.remove();send(u,true)};
+  d.append(c,r);b.appendChild(d)}
+function chips(arr){const c=$("chips");c.innerHTML="";
+ (arr||["Bantu susun jadwal hari ini","Catat tugas: kerjain laporan besok","Apa prioritas tugasku?","Kasih tips fokus 25 menit"]).forEach(q=>{const b=document.createElement("button");b.className="chip";b.textContent=q;b.onclick=()=>send(q);c.appendChild(b)})}
+function sys(){
+  const st={santai:"Pakai bahasa Indonesia santai, sapaan 'gue/kamu' atau 'aku/kamu', boleh sedikit emoji.",gaul:"Pakai bahasa Indonesia gaul anak muda, ekspresif, banyak emoji, tapi tetap jelas.",semi:"Pakai bahasa Indonesia santai tapi sopan, sapaan 'aku/kamu' atau 'kak', tidak kasar."}[$("style").value];
+  const dm={umum:"umum",kuliah:"kuliah & belajar (jadwal belajar, tugas kuliah, teknik belajar)",kerja:"kerja & karier (meeting, deadline, prioritas, email)",hobi:"hobi & waktu luang (jadwal hobi, proyek pribadi)",sehat:"kesehatan & kebiasaan (rutinitas, tidur, habit tracking)"}[$("domain").value];
+  const today=new Date().toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  return `Kamu adalah EduSmart Assistant, asisten produktivitas pribadi berbentuk rubah ramah. ${st} Domain fokus: ${dm}. Hari ini: ${today}.
+Tugasmu: bantu mengatur tugas, jadwal, prioritas, dan kebiasaan layaknya asisten cerdas. Pahami maksud di balik pesan, pikirkan langkah demi langkah sebelum menjawab, dan beri jawaban yang konkret. Gunakan markdown (daftar, **tebal**) bila membantu. Untuk permintaan jadwal buat time-block jam per jam; untuk curhat tugas berantakan, bantu pilah dan urutkan prioritas (mendesak vs penting). Jika info kurang, ajukan SATU pertanyaan klarifikasi. Jika pengguna melampirkan gambar (jadwal, catatan, to-do tulisan tangan), baca isinya dan tawarkan memasukkannya ke daftar tugas. Panjang jawaban secukupnya, jangan bertele-tele. Kamu bisa memakai get_time untuk tahu waktu sekarang.
+Kalau pengguna minta mencatat tugas, WAJIB panggil tool add_task. Untuk menandai selesai pakai complete_task. Untuk melihat daftar pakai list_tasks.
+${$("mem").checked?"Kalau pengguna menyebut info pribadi yang berguna (nama, jam kerja, preferensi, tujuan), simpan dengan tool save_memory. Memory saat ini: "+(mems.join("; ")||"(kosong)")+".":"Fitur memory dimatikan: jangan menyimpan info pribadi."}
+${$("rec").checked?"Di akhir jawaban, bila relevan, beri SATU rekomendasi singkat berikutnya (mis. teknik Pomodoro, time-blocking, aturan 2 menit).":"Jangan beri rekomendasi tambahan kecuali diminta."}
+Tugas saat ini: ${tasks.length?tasks.map(t=>`#${t.id} ${t.title}${t.due?" ("+t.due+")":""}${t.done?" [selesai]":""}`).join("; "):"(kosong)"}.`;
+}
+function tools(){
+ const T=[
+ {name:"add_task",description:"Tambah tugas ke daftar tugas pengguna",inputSchema:{type:"object",properties:{title:{type:"string"},due:{type:"string",description:"tenggat opsional"}},required:["title"]},
+  execute:i=>{const t={id:nid++,title:String(i.title).slice(0,120),due:i.due?String(i.due).slice(0,40):"",done:false};tasks.push(t);save();render();return{ok:true,id:t.id}}},
+ {name:"complete_task",description:"Tandai tugas selesai berdasarkan id",inputSchema:{type:"object",properties:{id:{type:"number"}},required:["id"]},
+  execute:i=>{const t=tasks.find(x=>x.id===i.id);if(!t)return{ok:false,error:"id tidak ditemukan"};t.done=true;save();render();return{ok:true}}},
+ {name:"delete_task",description:"Hapus tugas berdasarkan id",inputSchema:{type:"object",properties:{id:{type:"number"}},required:["id"]},
+  execute:i=>{const n=tasks.length;tasks=tasks.filter(x=>x.id!==i.id);save();render();return{ok:tasks.length<n}}},
+ {name:"get_time",description:"Dapatkan tanggal dan jam sekarang",inputSchema:{type:"object",properties:{}},execute:()=>({now:new Date().toLocaleString("id-ID",{dateStyle:"full",timeStyle:"short"})})},
+ {name:"list_tasks",description:"Lihat semua tugas",inputSchema:{type:"object",properties:{}},execute:()=>tasks}
+ ];
+ if($("mem").checked)T.push({name:"save_memory",description:"Simpan fakta singkat tentang pengguna",inputSchema:{type:"object",properties:{fact:{type:"string"}},required:["fact"]},
+  execute:i=>{const f=String(i.fact).slice(0,140);if(!mems.includes(f))mems.push(f);if(mems.length>20)mems.shift();save();render();return{ok:true}}});
+ return T;
+}
+function b64(f){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(",")[1]);r.onerror=no;r.readAsDataURL(f)})}
+function apiSample(key){
+ const M={quick:"claude-haiku-5-5",default:"claude-sonnet-5-5",complex:"claude-opus-5-5"};
+ const call=async(body,signal)=>{let r;
+  try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal,headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify(body)})}
+  catch(e){throw e.name==="AbortError"?{code:"cancelled",message:"dihentikan"}:{code:"network",message:"Gagal terhubung ke API ("+e.message+")"}}
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw{code:r.status===401?"bad_key":r.status===429?"rate_limited":"api_error",message:(j.error&&j.error.message)||("HTTP "+r.status)};
+  return j};
+ const sm=async(msgs,o={})=>{
+  const m=msgs.map(x=>({role:x.role,content:x.content}));
+  if(o.images&&o.images.length){const last=m[m.length-1];const parts=[];
+   for(const f of o.images)parts.push({type:"image",source:{type:"base64",media_type:f.type||"image/png",data:await b64(f)}});
+   parts.push({type:"text",text:last.content});last.content=parts}
+  const tl=(o.tools||[]).map(t=>({name:t.name,description:t.description,input_schema:t.inputSchema||{type:"object",properties:{}}}));
+  let text="";
+  for(let i=0;i<6;i++){
+   const body={model:M[o.modelTier]||M.default,max_tokens:1500,messages:m};if(tl.length)body.tools=tl;
+   const j=await call(body,o.signal);
+   text=j.content.filter(c=>c.type==="text").map(c=>c.text).join("\n");
+   if(o.onText&&text)o.onText({text});
+   if(j.stop_reason!=="tool_use")break;
+   m.push({role:"assistant",content:j.content});
+   const res=[];
+   for(const c of j.content.filter(c=>c.type==="tool_use")){const t=(o.tools||[]).find(x=>x.name===c.name);let out;
+    try{out=JSON.stringify(t?await t.execute(c.input):{error:"tool tidak ada"})}catch(e){out=JSON.stringify({error:String(e)})}
+    res.push({type:"tool_result",tool_use_id:c.id,content:out})}
+   m.push({role:"user",content:res});
+  }
+  return{text,truncated:false}};
+ sm.json=async(p,o={})=>{const r=await sm([{role:"user",content:p}],o);const mm=r.text.match(/[\[{][\s\S]*[\]}]/);return JSON.parse(mm?mm[0]:r.text)};
+ sm.limits=async()=>({images:true});
+ return sm}
+async function getSample(){
+  if(sample)return sample;
+  try{const c=window.claude;if(c)sample=await c.use("sample")}catch(e){}
+  if(!sample){let k="";try{k=localStorage.getItem("suciiii_key")||""}catch(e){}if(k)sample=apiSample(k)}
+  return sample;
+}
+function errText(e){
+  const c=e&&e.code;
+  if(c==="not_granted")return"Izinnya belum kamu setujui, jadi aku nggak bisa jawab. Refresh halaman lalu klik Izinkan saat diminta ya 🙏";
+  if(c==="bad_key")return"API key-nya ditolak. Cek lagi key di ⚙️ Pengaturan AI ya.";
+  if(c==="rate_limited")return"Kebanyakan permintaan, tunggu sebentar lalu coba lagi ya.";
+  if(c==="cancelled")return"(dihentikan)";
+  return"Ups, ada error"+(c?" ["+c+"]":"")+": "+((e&&e.message)||"tidak diketahui");
+}
+let ctl=null,pending=null;
+function clearPending(){pending=null;$("att").textContent="";$("file").value=""}
+async function followups(sm,u,a){
+  try{const j=await sm.json("Pertanyaan pengguna: "+u+"\nJawaban asisten: "+a.slice(0,800)+"\n\nBuat 3 saran pesan lanjutan singkat (maks 7 kata, bahasa Indonesia santai) yang mungkin ingin diketik pengguna berikutnya. Balas HANYA array JSON berisi 3 string.",{modelTier:"quick",cache:false});
+    if(Array.isArray(j)&&!busy)chips(j.slice(0,3).map(String))}catch(e){}
+}
+async function send(text,regen){
+  text=(text||"").trim();if(!text||busy)return;
+  busy=true;$("go").textContent="Stop";$("inp").value="";$("chips").innerHTML="";
+  const img=pending;clearPending();
+  if(!regen)add("user",(img?"🖼 "+img.name+"\n":"")+text);
+  const bubble=add("bot","");bubble.innerHTML='<span class="dots">EduSmart Assistant lagi mikir…</span>';
+  const sm=await getSample();
+  if(!sm){setB(bubble,"Aku belum terhubung ke AI 🙏 Buka **⚙️ Pengaturan AI** di panel kiri, masukkan API key Anthropic-mu, klik Simpan, lalu kirim pesan lagi.");busy=false;$("go").textContent="Kirim";return}
+  let imgs;if(img){try{const l=await sm.limits();if(l&&l.images)imgs=[img]}catch(e){}}
+  const msgs=hist.slice(-16).map(m=>({...m}));
+  msgs.push({role:"user",content:`[INSTRUKSI SISTEM]\n${sys()}\n[PESAN PENGGUNA]\n${text}`});
+  ctl=new AbortController();
+  const run=useTools=>sm(msgs,{modelTier:$("tier").value,cache:false,signal:ctl.signal,images:imgs,tools:useTools?tools():undefined,onText:({text:t})=>setB(bubble,t)});
+  let ok=false,ans="";
+  try{
+    let r;
+    try{r=await run(true)}
+    catch(e){if(e&&(e.code==="not_granted"||e.code==="cancelled"||e.code==="rate_limited"))throw e;bubble.innerHTML='<span class="dots">EduSmart Assistant lagi mikir…</span>';r=await run(false)}
+    ans=r.text||"";setB(bubble,ans||"(tidak ada jawaban, coba kirim ulang)");
+    hist.push({role:"user",content:text},{role:"assistant",content:ans||"-"});save();acts(bubble);ok=!!ans;
+  }catch(e){setB(bubble,(e&&e.text)||errText(e));if(e&&e.text&&e.code!=="cancelled")setB(bubble,e.text+"\n\n"+errText(e))}
+  busy=false;ctl=null;$("go").textContent="Kirim";$("inp").focus();
+  if(ok&&$("rec").checked)followups(sm,text,ans);
+}
+function greet(){add("bot","Halo! Aku EduSmart Assistant 🦊, asisten produktivitas pribadimu. Aku bisa bantu nyusun jadwal, nyatat tugas, milah prioritas, bahkan baca foto catatan atau to-do tulisan tanganmu (klik 📎). Atur gaya & domain di panel kiri, lalu mulai ngobrol!")}
+$("go").onclick=()=>{if(busy&&ctl)ctl.abort();else send($("inp").value)};
+$("inp").addEventListener("keydown",e=>{if(e.key==="Enter")send($("inp").value)});
+["style","domain","tier","mem","rec"].forEach(k=>$(k).addEventListener("change",save));
+$("keyd").open=!window.claude;
+$("savekey").onclick=()=>{const k=$("key").value.trim();if(!k)return;try{localStorage.setItem("suciiii_key",k)}catch(e){}sample=null;$("key").value="";$("keymsg").textContent="Tersimpan ✓ Sekarang coba kirim pesan.";getSample()};
+try{if(localStorage.getItem("suciiii_key"))$("keymsg").textContent="Key sudah tersimpan di browser ini ✓"}catch(e){}
+$("clip").onclick=()=>$("file").click();
+$("file").onchange=e=>{const f=e.target.files[0];if(f){pending=f;$("att").textContent="🖼 "+f.name+" (siap dikirim)"}};
+$("newc").onclick=()=>{if(busy&&ctl)ctl.abort();hist=[];save();$("log").innerHTML="";clearPending();greet();chips()};
+$("clrT").onclick=()=>{tasks=[];save();render()};$("clrM").onclick=()=>{mems=[];save();render()};
+render();chips();greet();
+for(let k=0;k<hist.length;k++){const m=hist[k];add(m.role==="user"?"user":"bot",m.content)}
+if(hist.length){const l=$("log").lastChild;if(l&&l.classList.contains("k"))acts(l)}
+getSample();
+</script>
+</body>
+</html>
